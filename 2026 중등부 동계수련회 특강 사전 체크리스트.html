@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 참좋은교회 중등부 동계수련회</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f0f9ff; color: #1e293b; }
+        .slide-section { min-height: 100vh; padding-top: 4rem; padding-bottom: 4rem; display: flex; flex-direction: column; justify-content: center; }
+        .card { background: white; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.5); transition: all 0.2s; }
+        .btn-primary:active { transform: scale(0.95); }
+        .hidden-content { display: none; opacity: 0; transition: opacity 0.5s ease-in; }
+        .visible-content { display: block; opacity: 1; }
+        .typewriter::after { content: '|'; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 300px; }
+        /* Scroll snap for app-like feel */
+        html { scroll-behavior: smooth; }
+    </style>
+    <!-- Chosen Palette: Fresh Blue (Trust/Tech) + Warm Gold (Spirit/Imago Dei) + White -->
+    <!-- Application Structure Plan: 
+         1. Intro (Reality Check): Gamified checklist of AI usage to trigger "Awareness".
+         2. Part 1 (Imago Dei): Visual comparison of "Token Prediction" vs "Soul". Solomon interactive story.
+         3. Part 2 (Discernment): "Discernment Gym" quiz to practice Rom 12:2.
+         4. Part 3 (Responsibility): "Tool Master" checklist.
+         5. Conclusion (Covenant): Input form to generate a personal pledge card.
+         Rationale: Middle schoolers engage better with "doing" than reading. 
+         This structure follows the lecture flow but turns every concept into an action. -->
+    <!-- Visualization & Content Choices:
+         - Intro: Bar chart comparing user's AI score to "Average". (Goal: Engagement)
+         - Imago Dei: Comparison Table + Interactive "AI Logic" simulation. (Goal: Understanding)
+         - Discernment: Quiz with immediate feedback emojis. (Goal: Practice)
+         - NO SVG/Mermaid used. Unicode icons and Chart.js used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-slate-50">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-sm shadow-sm z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-black text-blue-600 text-lg">✝️ Imago Dei</div>
+            <div class="flex space-x-2">
+                <div id="progress-bar" class="w-24 h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                    <div id="progress-fill" class="h-full bg-blue-600 w-0 transition-all duration-500"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-4">
+
+        <!-- INTRO: The Hook -->
+        <section id="intro" class="slide-section">
+            <div class="text-center mb-8">
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-4">2026 참좋은교회 중등부 동계수련회 특강</span>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-800 mb-4 leading-tight">
+                    AI 시대,<br><span class="text-blue-600">누가 주인인가?</span>
+                </h1>
+                <p class="text-lg text-slate-600 mb-8">나보다 나를 더 잘 아는 '그 녀석'과의 한판 승부</p>
+                <button onclick="scrollToSection('check')" class="btn-primary text-xl">
+                    시작하기 👇
+                </button>
+            </div>
+        </section>
+
+        <!-- PART 0: Reality Check -->
+        <section id="check" class="slide-section">
+            <div class="card p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">🕵️ 1단계: 내 손안의 스파이 찾기</h2>
+                <p class="text-slate-500 mb-6">오늘 아침부터 지금까지, AI를 몇 번 만났나요?</p>
+                
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="checkbox" class="ai-check w-5 h-5 text-blue-600" onchange="updateScore()">
+                        <span class="ml-3 text-lg">🔓 얼굴/지문 인식으로 잠금해제</span>
+                    </label>
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="checkbox" class="ai-check w-5 h-5 text-blue-600" onchange="updateScore()">
+                        <span class="ml-3 text-lg">📺 유튜브/틱톡/릴스 추천 영상 시청</span>
+                    </label>
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="checkbox" class="ai-check w-5 h-5 text-blue-600" onchange="updateScore()">
+                        <span class="ml-3 text-lg">🎧 음악 스트리밍 추천 듣기</span>
+                    </label>
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="checkbox" class="ai-check w-5 h-5 text-blue-600" onchange="updateScore()">
+                        <span class="ml-3 text-lg">💬 카톡/문자 자동 완성 기능</span>
+                    </label>
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="checkbox" class="ai-check w-5 h-5 text-blue-600" onchange="updateScore()">
+                        <span class="ml-3 text-lg">✏️ 챗GPT/번역기로 숙제 도움</span>
+                    </label>
+                </div>
+
+                <div id="result-area" class="hidden-content">
+                    <div class="bg-blue-50 p-4 rounded-xl mb-6 text-center">
+                        <p class="text-lg font-bold text-blue-800">당신의 AI 의존도는?</p>
+                        <h3 id="score-text" class="text-3xl font-black text-blue-600 my-2">0점</h3>
+                        <p class="text-sm text-blue-600">우리는 이미 AI와 함께 살고 있습니다!</p>
+                    </div>
+                <!--    <div class="chart-container">
+                        <canvas id="usageChart"></canvas>
+                    </div> -->
+                    <div class="text-center mt-6">
+                        <button onclick="scrollToSection('part1')" class="btn-primary">그럼 나는 누구? 👉</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 1: Imago Dei -->
+        <section id="part1" class="slide-section">
+            <div class="card p-6 md:p-8 mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">🧠 2단계: 계산기 vs 영혼</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- AI Side -->
+                    <div class="bg-gray-100 p-4 rounded-xl border border-gray-200">
+                        <div class="text-center mb-3">
+                            <span class="text-4xl">🤖</span>
+                            <h3 class="text-xl font-bold mt-2">AI (인공지능)</h3>
+                            <p class="text-xs text-gray-500">Next Token Prediction</p>
+                        </div>
+                        <div class="bg-black text-green-400 p-3 rounded-lg font-mono text-sm h-32 overflow-hidden relative">
+                            <div id="ai-typing" class="typewriter">데이터 분석 중...<br>확률 계산 중...<br>가장 적절한 단어 선택...</div>
+                        </div>
+                        <ul class="mt-4 text-sm text-gray-600 space-y-2">
+                            <li>❌ 마음이 없음</li>
+                            <li>❌ 미안함을 모름</li>
+                            <li>✅ 엄청 빠른 계산기</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Human Side -->
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                        <div class="text-center mb-3">
+                            <span class="text-4xl">👑</span>
+                            <h3 class="text-xl font-bold mt-2 text-amber-800">나 (Imago Dei)</h3>
+                            <p class="text-xs text-amber-600">하나님의 형상 (창 1:27)</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg text-sm h-32 flex items-center justify-center text-center">
+                            <p class="font-serif italic text-amber-900">"하나님이 자기 형상 곧 하나님의 형상대로 사람을 창조하시되 남자와 여자를 창조하시고"</p>
+                        </div>
+                        <ul class="mt-4 text-sm text-amber-800 space-y-2">
+                            <li>💖 사랑하고 공감함</li>
+                            <li>🙏 죄를 깨닫고 회개함</li>
+                            <li>✨ 가치를 창조함</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solomon Interactive -->
+            <div class="card p-6 bg-gradient-to-br from-indigo-900 to-purple-800 text-white">
+                <h3 class="text-xl font-bold mb-2">⚖️ 솔로몬의 재판 시뮬레이션</h3>
+                <p class="text-indigo-200 text-sm mb-4">두 여인이 서로 자기 아기라고 주장합니다. 누구의 손을 들어줘야 할까요?</p>
+                
+                <div id="solomon-q" class="grid grid-cols-1 gap-3">
+                    <button onclick="showJudgment('ai')" class="bg-white/10 hover:bg-white/20 p-4 rounded-lg text-left transition border border-white/20">
+                        <span class="block font-bold text-yellow-400 mb-1">🤖 AI의 판결</span>
+                        <span class="text-xs text-gray-300">효율성과 논리에 기반한 판단</span>
+                    </button>
+                    <button onclick="showJudgment('human')" class="bg-white/10 hover:bg-white/20 p-4 rounded-lg text-left transition border border-white/20">
+                        <span class="block font-bold text-yellow-400 mb-1">👑 솔로몬(하나님 형상)의 판결</span>
+                        <span class="text-xs text-gray-300">사랑과 생명에 기반한 판단</span>
+                    </button>
+                </div>
+
+                <div id="result-ai" class="hidden-content mt-4 bg-black/50 p-4 rounded-lg border border-red-400">
+                    <p class="font-mono text-green-400 text-sm">>> 분석 결과: 유전자 검사 불가.<br>>> 최적 솔루션: 공평하게 자산을 50:50으로 분할 지급.<br>>> (아이를 반으로 나눔 😱)</p>
+                    <button onclick="resetSolomon()" class="mt-2 text-xs underline text-gray-400">다시 선택</button>
+                </div>
+                
+                <div id="result-human" class="hidden-content mt-4 bg-white/20 p-4 rounded-lg border border-yellow-400">
+                    <p class="font-serif italic">"아이를 죽이지 말고 저 여자에게 주라. 저 여자가 진짜 엄마니라."</p>
+                    <p class="text-sm mt-2 text-yellow-200">💡 진짜 엄마의 '사랑'을 꿰뚫어 봄. 이것이 AI가 흉내 낼 수 없는 지혜입니다.</p>
+                    <div class="mt-4 text-center">
+                        <button onclick="scrollToSection('part2')" class="bg-yellow-500 text-black px-4 py-2 rounded-full font-bold text-sm">다음 단계로 👉</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: Discernment -->
+        <section id="part2" class="slide-section">
+            <div class="card p-6 md:p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-slate-800">💪 3단계: 분별력 체육관</h2>
+                    <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold">로마서 12:2</span>
+
+                </div>
+<p>"너희는 이 세대를 본받지 말고 오직 마음을 새롭게 함으로 변화를 받아 하나님의 선하시고 기뻐하시고 온전하신 뜻이 무엇인지 분별하도록 하라"</p>
+<br>
+                <p class="text-slate-500 mb-6">AI가 주는 답이 항상 '정답'은 아닙니다. 당신의 영적 근육을 테스트해보세요.</p>
+
+                <!-- Quiz Container -->
+                <div id="quiz-container" class="space-y-4">
+                    <!-- Q1 -->
+                    <div class="quiz-item border rounded-xl p-4 hover:shadow-md transition">
+                        <p class="font-bold text-lg mb-3">Q1. ChatGPT가 써준 독후감을 그대로 숙제로 냈다.</p>
+                        <div class="flex gap-2">
+                            <button onclick="checkAnswer(this, false, '내 생각이 자라지 않아요! 표절은 정직하지 못한 행동입니다.')" class="flex-1 py-2 border-2 border-slate-200 rounded-lg font-bold hover:bg-slate-50">
+                                🙆‍♂️ 괜찮다 (효율적)
+                            </button>
+                            <button onclick="checkAnswer(this, true, '딩동댕! 도구로 참고만 하고, 내 생각으로 다시 써야 합니다.')" class="flex-1 py-2 border-2 border-slate-200 rounded-lg font-bold hover:bg-slate-50">
+                                🙅‍♂️ 안된다 (비양심)
+                            </button>
+                        </div>
+                        <p class="feedback hidden mt-2 text-sm font-bold"></p>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="quiz-item border rounded-xl p-4 hover:shadow-md transition">
+                        <p class="font-bold text-lg mb-3">Q2. 유튜브 알고리즘이 추천하는 자극적인 영상을 계속 본다.</p>
+                        <div class="flex gap-2">
+                            <button onclick="checkAnswer(this, false, '알고리즘은 당신의 시간을 뺏으려 설계되었습니다. 끌려다니면 안돼요!')" class="flex-1 py-2 border-2 border-slate-200 rounded-lg font-bold hover:bg-slate-50">
+                                🙆‍♂️ 계속 본다 (재밌으니까)
+                            </button>
+                            <button onclick="checkAnswer(this, true, '나이스! 내가 주인이 되어 시청을 멈추는 것이 분별력입니다.')" class="flex-1 py-2 border-2 border-slate-200 rounded-lg font-bold hover:bg-slate-50">
+                                🙅‍♂️ 멈춘다 (내 시간이니까)
+                            </button>
+                        </div>
+                        <p class="feedback hidden mt-2 text-sm font-bold"></p>
+                    </div>
+                </div>
+
+                <div id="quiz-completion" class="hidden-content mt-6 text-center bg-green-50 p-4 rounded-xl border border-green-200">
+                    <p class="text-2xl">🎉</p>
+                    <h3 class="font-bold text-green-800">분별력 훈련 완료!</h3>
+                    <p class="text-green-700 text-sm">"너희는 이 세대를 본받지 말고 오직 마음을 새롭게 함으로 변화를 받아..."</p>
+                    <button onclick="scrollToSection('part3')" class="btn-primary mt-4 text-sm">마지막 단계로 👉</button>
+                </div>
+            </div>
+        </section>
+
+        
+
+    </main>
+
+    <footer class="bg-white mt-12 py-8 text-center text-slate-400 text-sm">
+        <p>&copy; 2026 참좋은교회 주일학교 중등부</p>
+    </footer>
+
+    <script>
+        // Smooth Scroll Logic
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-fill").style.width = scrolled + "%";
+        }
+        window.onscroll = function() {updateProgress()};
+
+        // --- PART 0: Reality Check Logic ---
+        function updateScore() {
+            const checks = document.querySelectorAll('.ai-check:checked');
+            const score = checks.length;
+            const resultArea = document.getElementById('result-area');
+            const scoreText = document.getElementById('score-text');
+
+            if (score > 0) {
+                if(resultArea.style.display !== 'block') {
+                    resultArea.style.display = 'block';
+                    setTimeout(() => resultArea.style.opacity = 1, 50);
+                    renderChart(score);
+                }
+                scoreText.innerText = `${score * 20}점`;
+            }
+        }
+
+        let chartInstance = null;
+        function renderChart(userScore) {
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['나의 의존도', '평균 학생'],
+                    datasets: [{
+                        label: 'AI 사용 빈도',
+                        data: [userScore, 3.5],
+                        backgroundColor: ['#2563eb', '#94a3b8'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 5 } }
+                }
+            });
+        }
+
+        // --- PART 1: Solomon Logic ---
+        function showJudgment(type) {
+            document.getElementById('solomon-q').style.display = 'none';
+            if (type === 'ai') {
+                const el = document.getElementById('result-ai');
+                el.style.display = 'block';
+                setTimeout(() => el.style.opacity = 1, 50);
+            } else {
+                const el = document.getElementById('result-human');
+                el.style.display = 'block';
+                setTimeout(() => el.style.opacity = 1, 50);
+            }
+        }
+
+        function resetSolomon() {
+            document.getElementById('result-ai').style.display = 'none';
+            document.getElementById('result-human').style.display = 'none';
+            document.getElementById('solomon-q').style.display = 'grid';
+        }
+
+        // --- PART 2: Quiz Logic ---
+        let correctCount = 0;
+        function checkAnswer(btn, isCorrect, msg) {
+            const parent = btn.parentElement.parentElement;
+            const feedback = parent.querySelector('.feedback');
+            const btns = parent.querySelectorAll('button');
+            
+            btns.forEach(b => b.disabled = true); // Disable buttons
+            
+            feedback.classList.remove('hidden');
+            feedback.innerText = msg;
+            
+            if (isCorrect) {
+                btn.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                feedback.classList.add('text-green-600');
+                correctCount++;
+            } else {
+                btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+                feedback.classList.add('text-red-600');
+            }
+
+            if (correctCount >= 2) { // Assuming user eventually gets them right or simple logic
+                const completion = document.getElementById('quiz-completion');
+                completion.style.display = 'block';
+                setTimeout(() => completion.style.opacity = 1, 50);
+            }
+        }
+
+        // --- PART 3: Covenant Logic ---
+        function generateCard(e) {
+            e.preventDefault();
+            const name = document.getElementById('username').value;
+            if(!name) return;
+
+            document.getElementById('covenant-form').style.display = 'none';
+            document.getElementById('cert-name').innerText = name;
+            
+            const now = new Date();
+            document.getElementById('cert-date').innerText = now.toLocaleDateString();
+
+            const cert = document.getElementById('certificate');
+            cert.style.display = 'block';
+            setTimeout(() => cert.style.opacity = 1, 50);
+        }
+    </script>
+</body>
+</html>

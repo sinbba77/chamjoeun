@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 시대, 기독 청소년의 세 가지 질문</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Harmony Blue & Warm Ivory (신뢰와 따뜻함의 조화) -->
+    <!-- Application Structure Plan: 
+         1. Intro: 강의의 결론을 요약하며 질문의 목적을 설명하는 인트로 섹션.
+         2. Section 1 (알고리즘 진단): 학생들이 스스로 '끌려다니는 영역'을 선택하면 데이터로 시각화해주는 인터렉티브 차트.
+         3. Section 2 (인간 고유성): AI와 인간의 능력을 비교하며 '절대 대신할 수 없는 것'을 상기시키는 매트릭스 레이아웃.
+         4. Section 3 (하나의 약속): 개인의 결단을 입력하고 디지털 서약 카드를 생성하는 최종 단계.
+         사용자 흐름: 인지(현상 파악) -> 성찰(본질 이해) -> 결단(행동 변화) -->
+    <!-- Visualization & Content Choices:
+         - Chart.js: 알고리즘 의존도 체크를 위한 가로 바 차트 (Canvas 사용).
+         - UI Components: Tailwind CSS를 활용한 반응형 카드 레이아웃.
+         - Interaction: Vanilla JS를 이용한 실시간 데이터 반영 및 서약서 생성 로직.
+         - CONFIRMATION: NO SVG used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #334155; scroll-behavior: smooth; }
+        .bg-warm-neutral { background-color: #fdfbf7; }
+        .text-accent { color: #d97706; } /* Warm Gold */
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 350px; max-height: 400px; }
+        .card-gradient { background: linear-gradient(145deg, #ffffff, #f1f5f9); }
+        .btn-bounce:active { transform: scale(0.95); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.6s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-warm-neutral">
+
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-50">
+        <div class="max-w-xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span class="font-black text-blue-700 tracking-tighter">AI & IMAGO DEI</span>
+            <span class="text-xs font-bold text-slate-400">2026 참좋은교회 중등부 동계수련회</span>
+        </div>
+    </nav>
+
+    <main class="max-w-xl mx-auto px-6 pt-24 pb-12 space-y-12">
+        
+        <!-- Intro Section -->
+        <section class="text-center space-y-4 animate-fade">
+            <h1 class="text-3xl font-black leading-tight text-slate-800">
+                특강의 마무리:<br><span class="text-blue-600">세 가지 질문</span>
+            </h1>
+            <p class="text-slate-500 leading-relaxed text-sm">
+                <strong>「AI 시대, 나는 누구인가? — 하나님의 형상으로 승부하라!」</strong>특강을 통해 배운 내용을 바탕으로, 이제 인공지능이 아닌 <strong>하나님 앞에 선 나</strong>를 돌아봅니다.<br>
+                아래 질문들에 솔직하게 답하며 여러분의 '영적 주권'을 회복하세요.
+            </p>
+        </section>
+
+        <!-- Q1: Algorithm Trap -->
+        <section class="space-y-6 animate-fade" style="animation-delay: 0.2s;">
+            <div class="card-gradient p-8 rounded-3xl shadow-sm border border-slate-100">
+                <div class="flex items-start space-x-3 mb-4">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">Q1</span>
+                    <h2 class="text-xl font-bold text-slate-800">나는 어디에 '조종'당하고 있나?</h2>
+                </div>
+                <p class="text-xs text-slate-400 mb-6">내가 의식하지 못한 채 알고리즘이 이끄는 대로 시간을 보내는 영역을 선택하세요. (중복 선택 가능)</p>
+                
+                <div class="grid grid-cols-2 gap-3 mb-8">
+                    <button onclick="toggleSelect(this, 'shorts')" class="q1-btn p-4 rounded-xl border-2 border-slate-100 bg-white text-sm font-medium transition-all hover:border-blue-200">📽️ 쇼츠/릴스</button>
+                    <button onclick="toggleSelect(this, 'game')" class="q1-btn p-4 rounded-xl border-2 border-slate-100 bg-white text-sm font-medium transition-all hover:border-blue-200">🎮 게임/알고리즘</button>
+                    <button onclick="toggleSelect(this, 'sns')" class="q1-btn p-4 rounded-xl border-2 border-slate-100 bg-white text-sm font-medium transition-all hover:border-blue-200">📱 SNS 피드</button>
+                    <button onclick="toggleSelect(this, 'webtoon')" class="q1-btn p-4 rounded-xl border-2 border-slate-100 bg-white text-sm font-medium transition-all hover:border-blue-200">🎨 웹툰/추천</button>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="trapChart"></canvas>
+                </div>
+                <p id="q1-feedback" class="text-center text-xs text-blue-600 font-bold mt-4 opacity-0 transition-opacity">"자각하는 순간, 알고리즘의 지배는 끝납니다!"</p>
+            </div>
+        </section>
+
+        <!-- Q2: Unique Human Capability -->
+        <section class="space-y-6 animate-fade" style="animation-delay: 0.4s;">
+            <div class="card-gradient p-8 rounded-3xl shadow-sm border border-slate-100">
+                <div class="flex items-start space-x-3 mb-4">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">Q2</span>
+                    <h2 class="text-xl font-bold text-slate-800">AI가 절대 흉내 낼 수 없는 것은?</h2>
+                </div>
+                <p class="text-xs text-slate-400 mb-6">하나님이 인간에게만 주신 '하나님의 형상'의 핵심 역량을 선택해 보세요.</p>
+                
+                <div class="space-y-3">
+                    <div class="group flex items-center p-4 bg-white rounded-2xl border border-slate-100 hover:border-amber-400 transition-colors cursor-pointer" onclick="selectQ2('사랑과 공감', 'AI는 텍스트를 생성하지만, 인간은 진심을 나눕니다.')">
+                        <span class="text-2xl mr-4">❤️</span>
+                        <div>
+                            <p class="font-bold text-slate-700">사랑과 공감</p>
+                            <p class="text-[10px] text-slate-400">함께 울고 웃는 영적 공명</p>
+                        </div>
+                    </div>
+                    <div class="group flex items-center p-4 bg-white rounded-2xl border border-slate-100 hover:border-amber-400 transition-colors cursor-pointer" onclick="selectQ2('회개와 영적 회복', '기계는 오류를 수정하지만, 인간은 삶을 돌이킵니다.')">
+                        <span class="text-2xl mr-4">🙏</span>
+                        <div>
+                            <p class="font-bold text-slate-700">회개와 영적 회복</p>
+                            <p class="text-[10px] text-slate-400">하나님과의 관계를 회복하는 힘</p>
+                        </div>
+                    </div>
+                    <div class="group flex items-center p-4 bg-white rounded-2xl border border-slate-100 hover:border-amber-400 transition-colors cursor-pointer" onclick="selectQ2('창의적 소명', 'AI는 패턴을 읽지만, 인간은 의미를 만듭니다.')">
+                        <span class="text-2xl mr-4">✨</span>
+                        <div>
+                            <p class="font-bold text-slate-700">창의적 소명</p>
+                            <p class="text-[10px] text-slate-400">무(無)에서 의미를 찾는 창조성</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="q2-result" class="mt-4 p-4 bg-amber-50 rounded-xl hidden border border-amber-100">
+                    <p id="q2-text" class="text-xs text-amber-800 font-medium text-center"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Q3: The One Promise -->
+        <section class="space-y-6 animate-fade" style="animation-delay: 0.6s;">
+            <div class="card-gradient p-8 rounded-3xl shadow-sm border border-slate-100 text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">Q3</span>
+                    <h2 class="text-xl font-bold text-slate-800">하나님 앞에서의 약속</h2>
+                </div>
+                <p class="text-sm text-slate-600 mb-6 italic">"기술은 도구일 뿐, 나는 하나님의 사람입니다."</p>
+                
+                <div class="space-y-4">
+                    <input type="text" id="studentName" placeholder="여러분의 이름" class="w-full p-4 rounded-xl border-2 border-slate-100 focus:border-blue-400 focus:outline-none text-center font-bold">
+                    <textarea id="promiseInput" rows="3" placeholder="AI를 쓸 때 지키고 싶은 나만의 한 가지 약속은?" class="w-full p-4 rounded-xl border-2 border-slate-100 focus:border-blue-400 focus:outline-none text-sm leading-relaxed"></textarea>
+                    <button onclick="generateCard()" class="w-full py-4 bg-slate-800 text-white font-black rounded-xl btn-bounce shadow-lg hover:bg-slate-700 transition-colors">
+                        영적 주권 서약서 생성 🎖️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Card Display -->
+        <section id="finalCardSection" class="hidden animate-fade">
+            <div id="pledgeCard" class="relative overflow-hidden card-gradient p-10 rounded-3xl border-4 border-slate-800 shadow-2xl text-center">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-slate-800 rounded-full opacity-5"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-600 rounded-full opacity-5"></div>
+                
+                <p class="text-[10px] font-black tracking-widest text-blue-600 mb-2 uppercase">Spiritual Sovereignty Covenant</p>
+                <h3 class="text-2xl font-black text-slate-800 mb-8">영적 주권 서약서</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-[10px] text-slate-400">서약자</p>
+                        <p id="display-name" class="text-xl font-bold text-slate-800 underline decoration-blue-500 underline-offset-4"></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400">나의 약속</p>
+                        <p id="display-promise" class="text-sm font-medium text-slate-700 leading-relaxed px-4 italic"></p>
+                    </div>
+                    <div class="pt-6 border-t border-slate-200">
+                        <p class="text-[10px] text-slate-400 mb-4">"오직 마음을 새롭게 함으로 변화를 받아... <br>하나님의 뜻이 무엇인지 분별하라 (롬 12:2)"</p>
+                        <p class="text-xs font-bold text-slate-300">2026 참좋은교회 중등부 동계수련회</p>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center text-xs text-slate-400 mt-6">화면을 캡처해서 소중히 간직하세요!</p>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-10 text-slate-300 text-[10px] font-medium border-t">
+        &copy; 2026 참좋은교회 중등부 동계수련회
+    </footer>
+
+    <script>
+        // --- Q1 Logic: Algorithm Trap Chart ---
+        const trapData = {
+            shorts: 0,
+            game: 0,
+            sns: 0,
+            webtoon: 0
+        };
+
+        const ctx = document.getElementById('trapChart').getContext('2d');
+        const trapChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['쇼츠/릴스', '게임', 'SNS', '웹툰'],
+                datasets: [{
+                    label: '나의 체감 의존도',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: ['#3b82f6', '#1e293b', '#64748b', '#94a3b8'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, max: 10, display: false },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        function toggleSelect(btn, key) {
+            btn.classList.toggle('border-blue-500');
+            btn.classList.toggle('bg-blue-50');
+            btn.classList.toggle('text-blue-700');
+            
+            trapData[key] = btn.classList.contains('bg-blue-50') ? 8 : 0;
+            trapChart.data.datasets[0].data = Object.values(trapData);
+            trapChart.update();
+            
+            document.getElementById('q1-feedback').style.opacity = "1";
+        }
+
+        // --- Q2 Logic: Insight Display ---
+        function selectQ2(title, description) {
+            const resultDiv = document.getElementById('q2-result');
+            const textEl = document.getElementById('q2-text');
+            textEl.innerHTML = `<strong>${title}</strong><br>${description}`;
+            resultDiv.classList.remove('hidden');
+            resultDiv.classList.add('animate-fade');
+        }
+
+        // --- Q3 Logic: Card Generation ---
+        function generateCard() {
+            const name = document.getElementById('studentName').value;
+            const promise = document.getElementById('promiseInput').value;
+            
+            if (!name || !promise) {
+                alert("이름과 약속을 모두 입력해 주세요!");
+                return;
+            }
+
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('display-promise').innerText = `"${promise}"`;
+            
+            const finalSection = document.getElementById('finalCardSection');
+            finalSection.classList.remove('hidden');
+            finalSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
